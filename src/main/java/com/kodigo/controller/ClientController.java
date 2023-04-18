@@ -26,7 +26,7 @@ public class ClientController {
         return Mono.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(fx)
-        ).defaultIfEmpty(ResponseEntity.notFound().build()); // si llega vacio retorna un 404 noContent
+        ).defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
