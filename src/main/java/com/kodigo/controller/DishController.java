@@ -1,8 +1,13 @@
 package com.kodigo.controller;
 
 import com.kodigo.model.Dish;
+import com.kodigo.pagination.PageSupport;
 import com.kodigo.service.IDishService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +17,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/dishes")
@@ -43,7 +51,7 @@ public class DishController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Dish>> save(@RequestBody Dish dish, final ServerHttpRequest req) {
+    public Mono<ResponseEntity<Dish>> save(@Valid @RequestBody Dish dish, final ServerHttpRequest req) {
         return service.save(dish)
                 .map(e -> ResponseEntity
                         .created(URI.create(req.getURI().toString().concat("/").concat(e.getId())))
@@ -53,7 +61,7 @@ public class DishController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Dish>> update(@PathVariable("id") String id, @RequestBody Dish dish) {
+    public Mono<ResponseEntity<Dish>> update(@Valid @PathVariable("id") String id, @RequestBody Dish dish) {
         dish.setId(id);
 
         //validar que exista el id
@@ -81,6 +89,42 @@ public class DishController {
                         .thenReturn(new ResponseEntity<Void>(HttpStatus.NO_CONTENT))
                 )
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/pageable")
+    public Mono<ResponseEntity<PageSupport<Dish>>> getPage(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "0") int size
+    ) {
+        return service.getPage(PageRequest.of(page, size))
+                .map(pag -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(pag)
+                ).defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    //private Dish dishHateoas; //practica no recomendada
+
+    @GetMapping("/hateoas/{id}")
+    public Mono<EntityModel> getHateoas(@PathVariable("id") String id) {
+        Mono<Link> link = linkTo(methodOn(DishController.class).findById(id)).withSelfRel().toMono();
+
+        //practica no recomendada
+        /*return service.findById(id) //Mono<Dish>
+                .flatMap(d -> {
+                    dishHateoas = d;
+                    return link;
+                })
+                .map(lk -> EntityModel.of(dishHateoas, lk));*/
+
+        // practica intermedia
+        /*return service.findById(id)
+                .flatMap(d -> link.map(lk -> EntityModel.of(d, lk)));*/
+
+        //practica ideal
+        return service.findById(id)
+                .zipWith(link, EntityModel::of); //(d, lk)-> EntityModel.of(d, lk))
+
     }
 
 }

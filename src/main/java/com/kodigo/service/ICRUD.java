@@ -1,7 +1,10 @@
 package com.kodigo.service;
 
+import com.kodigo.pagination.PageSupport;
+import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 
 public interface ICRUD<T, ID> {
     Mono<T> save(T t);
@@ -13,4 +16,6 @@ public interface ICRUD<T, ID> {
     Mono<T> findById(ID id);
 
     Mono<Void> delete(ID id);
+
+    Mono<PageSupport<T>> getPage(Pageable page);
 }

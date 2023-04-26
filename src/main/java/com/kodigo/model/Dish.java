@@ -1,5 +1,8 @@
 package com.kodigo.model;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,16 +19,19 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Dish {
 
     @Id
+    @EqualsAndHashCode.Include
     private String id;
 
+    @Size(min = 3)
     @Field //@Field es opcional, xq va a tomar el nombre del atributo
     private String name;
 
+    @Min(value = 1)
     @Field
     private Double price;
 
+    @NotNull
     @Field
     private Boolean status;
-
 
 }
