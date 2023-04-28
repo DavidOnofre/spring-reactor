@@ -9,29 +9,26 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Document(collection = "invoices")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Document(collection = "clients")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Client {
+public class Invoice {
 
     @Id
     @EqualsAndHashCode.Include
     private String id;
 
     @Field
-    private String firstName;
+    private String description;
 
     @Field
-    private String lastName;
+    private Client client;
 
     @Field
-    private LocalDate birthDate;
-
-    @Field
-    private String urlPhoto;
+    private List<InvoiceDetail> items;
 }

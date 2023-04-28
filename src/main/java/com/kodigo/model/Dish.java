@@ -1,5 +1,6 @@
 package com.kodigo.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true) // para comparar 2 objetos y no sean comparados por espacios en memoria.
 @Document(collection = "dishes")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dish {
 
     @Id
