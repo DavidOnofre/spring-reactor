@@ -28,7 +28,7 @@ public class DishController {
 
     private final IDishService service;
 
-    @GetMapping
+    /*@GetMapping
     public Mono<ResponseEntity<Flux<Dish>>> findAll() {
         //return service.findAll(); // Flux<Dish>
 
@@ -37,6 +37,46 @@ public class DishController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(fx)
         ).defaultIfEmpty(ResponseEntity.notFound().build()); // si llega vacio retorna un 404 noContent
+    }*/
+
+    /*@GetMapping // un flux con diferentes EntityModel con 1 diferentes link
+    public Mono<ResponseEntity<Flux<EntityModel<Dish>>>> findAll() {
+        Flux<EntityModel<Dish>> fx = service.findAll()
+                .flatMap(dish ->
+                        linkTo(methodOn(DishController.class).findById(dish.getId()))
+                                .withSelfRel()
+                                .toMono()
+                                .map(link -> EntityModel.of(dish, link))
+                );
+
+        return Mono.just(ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(fx))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }*/
+
+    @GetMapping //un flux con diferentes EntityModel con diferentes links
+    public Mono<ResponseEntity<Flux<EntityModel<Dish>>>> findAll() {
+        Flux<EntityModel<Dish>> fx = service.findAll()
+                .flatMap(dish ->
+                        Mono.zip(
+                                        linkTo(methodOn(DishController.class).findById(dish.getId()))
+                                                .withSelfRel()
+                                                .toMono(),
+                                        linkTo(methodOn(DishController.class).findById(dish.getId()))
+                                                .withSelfRel()
+                                                .toMono()
+
+                                )
+
+                                .map(links -> EntityModel.of(dish, links.getT1(), links.getT2()))
+
+                );
+
+        return Mono.just(ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(fx))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
