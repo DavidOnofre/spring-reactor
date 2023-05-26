@@ -76,10 +76,10 @@ public class InvoiceServiceImpl extends CRUDImpl<Invoice, String> implements IIn
                         }))
                 .collect(Collectors.toList());
 
-        return Mono.when(lst).then(Mono.just(invoice));
+        return Mono.when(lst).then(Mono.just(invoice));// david
     }
 
-    /*@Override
+    /*@Override // se refactoriza en los metodos anteriores, mismo resultado
     public Mono<byte[]> generateReport(String idInvoice) {
         return invoiceRepo.findById(idInvoice)
 
