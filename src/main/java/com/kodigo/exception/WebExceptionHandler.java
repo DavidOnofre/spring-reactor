@@ -51,7 +51,7 @@ public class WebExceptionHandler extends AbstractErrorWebExceptionHandler {
 
         // HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         // desde java 10 existe la variable var
-        // cuando se dezconoce el tipo de dato del lado izquierdo se usa var
+        // cuando se desconoce el tipo de dato del lado izquierdo se usa var
         var status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         String statusCode = String.valueOf(generalError.get("status"));

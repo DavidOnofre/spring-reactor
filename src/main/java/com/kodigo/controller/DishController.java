@@ -60,17 +60,14 @@ public class DishController {
         Flux<EntityModel<Dish>> fx = service.findAll()
                 .flatMap(dish ->
                         Mono.zip(
-                                        linkTo(methodOn(DishController.class).findById(dish.getId()))
-                                                .withSelfRel()
-                                                .toMono(),
-                                        linkTo(methodOn(DishController.class).findById(dish.getId()))
-                                                .withSelfRel()
-                                                .toMono()
-
-                                )
-
-                                .map(links -> EntityModel.of(dish, links.getT1(), links.getT2()))
-
+                                linkTo(methodOn(DishController.class).findById(dish.getId()))
+                                        .withSelfRel()
+                                        .toMono(),
+                                linkTo(methodOn(DishController.class).findById(dish.getId()))
+                                        .withSelfRel()
+                                        .toMono()
+                        )
+                        .map(links -> EntityModel.of(dish, links.getT1(), links.getT2()))
                 );
 
         return Mono.just(ResponseEntity.ok()
