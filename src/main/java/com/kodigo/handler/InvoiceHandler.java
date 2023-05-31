@@ -1,7 +1,7 @@
 package com.kodigo.handler;
 
-import com.kodigo.model.Client;
-import com.kodigo.service.IClientService;
+import com.kodigo.model.Invoice;
+import com.kodigo.service.IInvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -15,61 +15,60 @@ import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
 @Component
 @RequiredArgsConstructor
-public class ClientHandler {
+public class InvoiceHandler {
 
-    private final IClientService service;
-
+    private final IInvoiceService service;
+   
     public Mono<ServerResponse> findAll(ServerRequest request) {
         return ServerResponse
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(service.findAll(), Client.class);
+                .body(service.findAll(), Invoice.class);
     }
 
     public Mono<ServerResponse> findById(ServerRequest request) {
         String id = request.pathVariable("id");
 
         return service.findById(id)
-                .flatMap(client -> ServerResponse
+                .flatMap(invoice -> ServerResponse
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(fromValue(client))
+                        .body(fromValue(invoice))
                 )
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> create(ServerRequest request) {
-        Mono<Client> monoClient = request.bodyToMono(Client.class);
+        Mono<Invoice> monoInvoice = request.bodyToMono(Invoice.class);
 
-        return monoClient
+        return monoInvoice
                 .flatMap(service::save)
-                .flatMap(client -> ServerResponse
-                        .created(URI.create(request.uri().toString().concat("/").concat(client.getId())))
+                .flatMap(invoice -> ServerResponse
+                        .created(URI.create(request.uri().toString().concat("/").concat(invoice.getId())))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(fromValue(client))
+                        .body(fromValue(invoice))
                 );
     }
 
     public Mono<ServerResponse> update(ServerRequest request) {
         String id = request.pathVariable("id");
 
-        Mono<Client> monoClient = request.bodyToMono(Client.class);
-        Mono<Client> monoDB = service.findById(id);
+        Mono<Invoice> monoInvoice = request.bodyToMono(Invoice.class);
+        Mono<Invoice> monoDB = service.findById(id);
 
         return monoDB
-                .zipWith(monoClient, (db, di) -> {
+                .zipWith(monoInvoice, (db, di) -> {
                     db.setId(id);
-                    db.setFirstName(di.getFirstName());
-                    db.setLastName(di.getLastName());
-                    db.setBirthDate(di.getBirthDate());
-                    db.setUrlPhoto(di.getUrlPhoto());
+                    db.setClient(di.getClient());
+                    db.setDescription(di.getDescription());
+                    db.setItems(di.getItems());
                     return db;
                 })
                 .flatMap(service::update)
-                .flatMap(client -> ServerResponse
+                .flatMap(invoice -> ServerResponse
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(fromValue(client))
+                        .body(fromValue(invoice))
                 )
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
@@ -78,7 +77,7 @@ public class ClientHandler {
         String id = request.pathVariable("id");
 
         return service.findById(id)
-                .flatMap(client -> service.delete(client.getId())
+                .flatMap(invoice -> service.delete(invoice.getId())
                         .then(ServerResponse.noContent().build())
                 )
                 .switchIfEmpty(ServerResponse.notFound().build());
