@@ -28,16 +28,17 @@ public class DishController {
 
     private final IDishService service;
 
-    /*@GetMapping
+    @GetMapping
     public Mono<ResponseEntity<Flux<Dish>>> findAll() {
         //return service.findAll(); // Flux<Dish>
 
         Flux<Dish> fx = service.findAll();
+
         return Mono.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(fx)
         ).defaultIfEmpty(ResponseEntity.notFound().build()); // si llega vacio retorna un 404 noContent
-    }*/
+    }
 
     /*@GetMapping // un flux con diferentes EntityModel con 1 diferentes link
     public Mono<ResponseEntity<Flux<EntityModel<Dish>>>> findAll() {
@@ -55,7 +56,7 @@ public class DishController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }*/
 
-    @GetMapping //un flux con diferentes EntityModel con diferentes links
+    /*@GetMapping //un flux con diferentes EntityModel con diferentes links
     public Mono<ResponseEntity<Flux<EntityModel<Dish>>>> findAll() {
         Flux<EntityModel<Dish>> fx = service.findAll()
                 .flatMap(dish ->
@@ -74,7 +75,7 @@ public class DishController {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(fx))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
+    }*/
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<Dish>> findById(@PathVariable("id") String id) {
