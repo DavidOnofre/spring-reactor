@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,12 +29,17 @@ public class DishController {
 
     private final IDishService service;
 
+    // conversa con el contexto de spring security, para saber si el que ingreso es ADMIN
+    // si quisiera mas de un rol
+    // @PreAuthorize("hasAuthority('ADMIN') and ")
+    // @PreAuthorize("hasAuthority('ADMIN') or ")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public Mono<ResponseEntity<Flux<Dish>>> findAll() {
         //return service.findAll(); // Flux<Dish>
 
         Flux<Dish> fx = service.findAll();
-
+        // todo kodigo
         return Mono.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(fx)
